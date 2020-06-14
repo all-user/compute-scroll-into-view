@@ -241,7 +241,14 @@ function alignNearest(
   return 0
 }
 
-export default (target: Element, options: Options): CustomScrollAction[] => {
+function computeScrollIntoOwnerDocumentDefaultView(target: Element, options: Options): CustomScrollAction[] {
+  const doc = target.ownerDocument
+  const win = doc.defaultView
+
+  if (!doc || !win) {
+    return []
+  }
+
   const {
     scrollMode,
     block,
@@ -260,7 +267,7 @@ export default (target: Element, options: Options): CustomScrollAction[] => {
   }
 
   // Used to handle the top most element that can be scrolled
-  const scrollingElement = document.scrollingElement || document.documentElement
+  const scrollingElement = doc.scrollingElement || doc.documentElement
 
   // Collect all the scrolling boxes, as defined in the spec: https://drafts.csswg.org/cssom-view/#scrolling-box
   const frames: Element[] = []
@@ -277,9 +284,9 @@ export default (target: Element, options: Options): CustomScrollAction[] => {
 
     // Skip document.body if it's not the scrollingElement and documentElement isn't independently scrollable
     if (
-      cursor === document.body &&
+      cursor === doc.body &&
       isScrollable(cursor) &&
-      !isScrollable(document.documentElement as HTMLElement)
+      !isScrollable(doc.documentElement as HTMLElement)
     ) {
       continue
     }
@@ -295,16 +302,16 @@ export default (target: Element, options: Options): CustomScrollAction[] => {
   // and viewport dimensions on window.innerWidth/Height
   // https://www.quirksmode.org/mobile/viewports2.html
   // https://bokand.github.io/viewport/index.html
-  const viewportWidth = window.visualViewport
-    ? visualViewport.width
-    : innerWidth
-  const viewportHeight = window.visualViewport
-    ? visualViewport.height
-    : innerHeight
+  const viewportWidth = win.visualViewport
+    ? win.visualViewport.width
+    : win.innerWidth
+  const viewportHeight = win.visualViewport
+    ? win.visualViewport.height
+    : win.innerHeight
 
   // Newer browsers supports scroll[X|Y], page[X|Y]Offset is
-  const viewportX = window.scrollX || pageXOffset
-  const viewportY = window.scrollY || pageYOffset
+  const viewportX = win.scrollX || win.pageXOffset
+  const viewportY = win.scrollY || win.pageYOffset
 
   const {
     height: targetHeight,
@@ -505,4 +512,21 @@ export default (target: Element, options: Options): CustomScrollAction[] => {
   }
 
   return computations
+}
+
+export default (target: Element, options: Options): CustomScrollAction[] => {
+  const targets = []
+  let cursor: Element | undefined = target
+
+  while (cursor) {
+    targets.push(cursor)
+    if (cursor?.ownerDocument.defaultView === window) {
+      break
+    }
+    cursor = cursor.ownerDocument.defaultView?.frameElement
+  }
+
+  return targets.reduce((computations: CustomScrollAction[], target) => {
+    return computations.concat(computeScrollIntoOwnerDocumentDefaultView(target, options))
+  }, [])
 }
