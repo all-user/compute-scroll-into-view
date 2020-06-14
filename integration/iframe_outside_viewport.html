@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<script src="../umd/compute-scroll-into-view.js"></script>
+<script src="../umd/compute-scroll-into-view.min.js"></script>
 <script src="./utils.js"></script>
 
 <div style="height: 100vh"></div>
 
-<iframe srcdoc="
+<iframe style="heihgt: 100px; width: 100px; max-height: 100px; max-width: 100px;" srcdoc="
+  <style>html, body { margin: 0 }</style>
+  <div style='height: 300px;'></div>
   <div class='target' style='background: crimson; height: 100px; width: 100px;'></div>
 ">
 </iframe>

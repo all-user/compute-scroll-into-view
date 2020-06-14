@@ -4,7 +4,7 @@ beforeAll(async () => {
 
 describe('target in iframe is outside viewport', () => {
   test('should scroll top window', async () => {
-    expect.assertions(3)
+    expect.assertions(4)
     const actual = await page.evaluate(() => {
       const iframe = document.querySelector('iframe')
       const target = iframe.contentDocument.querySelector('.target')
@@ -14,8 +14,9 @@ describe('target in iframe is outside viewport', () => {
         })
         .map(window.mapActions)
     })
-    expect(actual).toHaveLength(1)
+    expect(actual).toHaveLength(2)
     expect(actual[0]).toMatchObject({ el: 'html' })
+    expect(actual[1]).toMatchObject({ el: 'html' }, { el: 'html' })
     expect(actual).toMatchSnapshot()
   })
 })

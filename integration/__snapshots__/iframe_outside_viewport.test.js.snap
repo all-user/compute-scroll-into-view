@@ -5,7 +5,12 @@ Array [
   Object {
     "el": "html",
     "left": 0,
-    "top": 366,
+    "top": 300,
+  },
+  Object {
+    "el": "html",
+    "left": 0,
+    "top": 124,
   },
 ]
 `;

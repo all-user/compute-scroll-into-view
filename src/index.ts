@@ -441,8 +441,20 @@ function computeScrollIntoOwnerDocumentDefaultView(target: Element, options: Opt
 
       // Apply scroll position offsets and ensure they are within bounds
       // @TODO add more test cases to cover this 100%
-      blockScroll = Math.max(0, blockScroll + viewportY)
-      inlineScroll = Math.max(0, inlineScroll + viewportX)
+      blockScroll = Math.max(
+        0,
+        Math.min(
+          frame.scrollHeight - frame.clientHeight,
+          blockScroll + viewportY
+        )
+      )
+      inlineScroll = Math.max(
+        0,
+        Math.min(
+          frame.scrollWidth - frame.clientWidth,
+          inlineScroll + viewportX
+        )
+      )
     } else {
       // Handle each scrolling frame that might exist between the target and the viewport
 
